@@ -1,0 +1,75 @@
+import pygame
+import sys
+
+# Initialize Pygame
+pygame.init()
+
+# Constants
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+FONT_SIZE = 24
+
+# Setup the screen
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption('Prisoner\'s Dilemma')
+
+# Setup fonts
+font = pygame.font.Font(None, FONT_SIZE)
+
+# Game variables
+player_choice = None
+computer_choice = None
+outcome = ""
+
+def draw_text(text, pos, color=BLACK):
+    label = font.render(text, True, color)
+    screen.blit(label, pos)
+
+def get_computer_choice():
+    import random
+    return random.choice(["Cooperate", "Defect"])
+
+def determine_outcome(player, computer):
+    if player == "Cooperate" and computer == "Cooperate":
+        return "Both Cooperate: 2 Points Each"
+    elif player == "Cooperate" and computer == "Defect":
+        return "You Cooperate, Computer Defects: 0 Points You, 3 Points Computer"
+    elif player == "Defect" and computer == "Cooperate":
+        return "You Defect, Computer Cooperates: 3 Points You, 0 Points Computer"
+    elif player == "Defect" and computer == "Defect":
+        return "Both Defect: 1 Point Each"
+
+# Main game loop
+running = True
+while running:
+    screen.fill(WHITE)
+
+    # Event handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_c:
+                player_choice = "Cooperate"
+                computer_choice = get_computer_choice()
+                outcome = determine_outcome(player_choice, computer_choice)
+            elif event.key == pygame.K_d:
+                player_choice = "Defect"
+                computer_choice = get_computer_choice()
+                outcome = determine_outcome(player_choice, computer_choice)
+
+    # Draw text
+    draw_text("Press C to Cooperate, D to Defect", (20, 20))
+    if player_choice:
+        draw_text(f"Player Choice: {player_choice}", (20, 60))
+    if computer_choice:
+        draw_text(f"Computer Choice: {computer_choice}", (20, 100))
+    if outcome:
+        draw_text(f"Outcome: {outcome}", (20, 140))
+
+    pygame.display.flip()
+
+pygame.quit()
