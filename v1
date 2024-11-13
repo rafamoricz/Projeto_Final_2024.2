@@ -1,4 +1,4 @@
-import pygame
+'''import pygame
 import sys
 
 # Initialize Pygame
@@ -70,6 +70,121 @@ while running:
     if outcome:
         draw_text(f"Outcome: {outcome}", (20, 140))
 
+    pygame.display.flip()
+
+pygame.quit()'''
+
+import pygame
+import sys
+
+# Inicialização do Pygame
+pygame.init()
+
+# Constantes
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+FONT_SIZE = 24
+NUM_ROUNDS = 10
+
+# Configuração da tela
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption('Prisoner\'s Dilemma')
+
+# Configuração da fonte
+font = pygame.font.Font(None, FONT_SIZE)
+
+# Variáveis de jogo
+player_choice = None
+computer_choice = None
+outcome = ""
+player_score = 0
+computer_score = 0
+round_count = 0
+player_moves = []
+computer_moves = []
+
+# Função para desenhar texto
+def draw_text(text, pos, color=BLACK):
+    label = font.render(text, True, color)
+    screen.blit(label, pos)
+
+# Função para gerar a escolha do computador
+def get_computer_choice():
+    import random
+    return random.choice(["Cooperate", "Defect"])
+
+# Função para determinar o resultado da rodada
+def determine_outcome(player, computer):
+    global player_score, computer_score
+    if player == "Cooperate" and computer == "Cooperate":
+        player_score += 2
+        computer_score += 2
+        return "Both Cooperate: 2 Points Each"
+    elif player == "Cooperate" and computer == "Defect":
+        computer_score += 3
+        return "You Cooperate, Computer Defects: 0 Points You, 3 Points Computer"
+    elif player == "Defect" and computer == "Cooperate":
+        player_score += 3
+        return "You Defect, Computer Cooperates: 3 Points You, 0 Points Computer"
+    elif player == "Defect" and computer == "Defect":
+        player_score += 1
+        computer_score += 1
+        return "Both Defect: 1 Point Each"
+
+# Função para desenhar o placar
+def draw_scoreboard():
+    for i in range(NUM_ROUNDS):
+        # Computador
+        color = GREEN if i < len(computer_moves) and computer_moves[i] == "Cooperate" else RED
+        pygame.draw.rect(screen, color, (20 + i * 40, 200, 30, 30))
+        
+        # Jogador
+        color = GREEN if i < len(player_moves) and player_moves[i] == "Cooperate" else RED
+        pygame.draw.rect(screen, color, (20 + i * 40, 250, 30, 30))
+
+# Loop principal do jogo
+running = True
+while running:
+    screen.fill(WHITE)
+
+    # Manipulação de eventos
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if round_count < NUM_ROUNDS:
+                if event.key == pygame.K_c:
+                    player_choice = "Cooperate"
+                    computer_choice = get_computer_choice()
+                    outcome = determine_outcome(player_choice, computer_choice)
+                    player_moves.append(player_choice)
+                    computer_moves.append(computer_choice)
+                    round_count += 1
+                elif event.key == pygame.K_d:
+                    player_choice = "Defect"
+                    computer_choice = get_computer_choice()
+                    outcome = determine_outcome(player_choice, computer_choice)
+                    player_moves.append(player_choice)
+                    computer_moves.append(computer_choice)
+                    round_count += 1
+
+    # Desenhar texto
+    draw_text("Press C to Cooperate, D to Defect", (20, 20))
+    draw_text(f"Player Score: {player_score}", (20, 60))
+    draw_text(f"Computer Score: {computer_score}", (20, 100))
+    draw_text(f"Rounds Played: {round_count}/{NUM_ROUNDS}", (20, 140))
+    if outcome:
+        draw_text(f"Outcome: {outcome}", (20, 180))
+
+    # Desenhar placar visual
+    draw_scoreboard()
+
+    # Atualizar a tela
     pygame.display.flip()
 
 pygame.quit()
